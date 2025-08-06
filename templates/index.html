@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>SoundCloud to MP3</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container text-center mt-5">
+        <h1>Tải nhạc từ SoundCloud</h1>
+        <form id="urlForm" method="post">
+            <div class="form-group">
+                <input type="text" name="url" class="form-control" placeholder="Dán liên kết SoundCloud tại đây" required
+                {% if song_info %} value="{{ song_info.url }}" {% endif %}>
+            </div>
+            <button type="submit" class="btn btn-primary">Lấy thông tin bài hát</button>
+        </form>
+        {% if song_info %}
+        <div id="songInfo" class="mt-4">
+            <img src="{{ song_info.thumbnail }}" alt="Cover" class="img-thumbnail mb-2" width="200">
+            <h3>{{ song_info.title }}</h3>
+            <p>Nghệ sĩ: {{ song_info.artist }}</p>
+            <p>Thời lượng: {{ song_info.duration // 60 }}:{{ "%02d"|format(song_info.duration % 60) }}</p>
+            <button id="downloadBtn" class="btn btn-success mt-2">Tải về MP3</button>
+            <div class="progress mt-3" style="height: 25px;">
+                <div id="downloadProgress" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+            </div>
+            <p id="speed" class="mt-2"></p>
+        </div>
+        <script>
+        var url = "{{ song_info.url }}";
+        </script>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

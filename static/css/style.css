@@ -1,0 +1,22 @@
+body {
+    background-color: #f8f9fa;
+}
+
+h1 {
+    color: #ff5500;
+    margin-bottom: 30px;
+}
+
+.btn-primary, .btn-success {
+    background-color: #ff5500;
+    border-color: #ff5500;
+}
+
+.btn-primary:hover, .btn-success:hover {
+    background-color: #e64a00;
+    border-color: #e64a00;
+}
+
+.progress {
+    height: 25px;
+}
