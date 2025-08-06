@@ -1,38 +1,105 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SoundCloud to MP3</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Social-Hub Downloader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container text-center mt-5">
-        <h1>Tải nhạc từ SoundCloud</h1>
-        <form id="urlForm" method="post">
-            <div class="form-group">
-                <input type="text" name="url" class="form-control" placeholder="Dán liên kết SoundCloud tại đây" required
-                {% if song_info %} value="{{ song_info.url }}" {% endif %}>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-4">🎧 Social-Hub Downloader</h1>
+        <p class="text-center text-muted mb-4">Tải nhạc và video từ YouTube, TikTok, SoundCloud</p>
+
+        <!-- Form nhập URL -->
+        <form method="POST" class="card shadow p-4 mb-5">
+            <div class="mb-3">
+                <label for="url" class="form-label">Dán liên kết từ nền tảng bạn muốn tải:</label>
+                <input type="url" class="form-control" name="url" id="url" placeholder="https://..." required>
             </div>
-            <button type="submit" class="btn btn-primary">Lấy thông tin bài hát</button>
+
+            <div class="mb-3">
+                <label class="form-label">Chọn nền tảng:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="platform" value="youtube" id="youtube" checked>
+                    <label class="form-check-label" for="youtube">YouTube</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="platform" value="tiktok" id="tiktok">
+                    <label class="form-check-label" for="tiktok">TikTok</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="platform" value="soundcloud" id="soundcloud">
+                    <label class="form-check-label" for="soundcloud">SoundCloud</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Định dạng tải xuống:</label>
+                <select class="form-select" name="format" required>
+                    <option value="audio">Âm thanh (MP3)</option>
+                    <option value="video">Video (MP4)</option>
+                </select>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Phân tích & Tải xuống</button>
+            </div>
         </form>
-        {% if song_info %}
-        <div id="songInfo" class="mt-4">
-            <img src="{{ song_info.thumbnail }}" alt="Cover" class="img-thumbnail mb-2" width="200">
-            <h3>{{ song_info.title }}</h3>
-            <p>Nghệ sĩ: {{ song_info.artist }}</p>
-            <p>Thời lượng: {{ song_info.duration // 60 }}:{{ "%02d"|format(song_info.duration % 60) }}</p>
-            <button id="downloadBtn" class="btn btn-success mt-2">Tải về MP3</button>
-            <div class="progress mt-3" style="height: 25px;">
-                <div id="downloadProgress" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+
+        <!-- Nếu có thông tin media -->
+        {% if media_info %}
+        <div class="card shadow">
+            <div class="row g-0">
+                {% if media_info.thumbnail %}
+                <div class="col-md-4">
+                    <img src="{{ media_info.thumbnail }}" class="img-fluid rounded-start" alt="Thumbnail">
+                </div>
+                {% endif %}
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ media_info.title }}</h5>
+                        <p class="card-text"><strong>Nguồn:</strong> {{ media_info.platform|capitalize }}</p>
+                        <p class="card-text"><strong>Người đăng:</strong> {{ media_info.uploader }}</p>
+                        <p class="card-text"><strong>Thời lượng:</strong> {{ media_info.duration }} giây</p>
+                        <button class="btn btn-success" onclick="download('{{ media_info.url }}', '{{ media_info.platform }}', '{{ media_info.format }}')">
+                            Tải về {{ 'MP3' if media_info.format == 'audio' else 'MP4' }}
+                        </button>
+                    </div>
+                </div>
             </div>
-            <p id="speed" class="mt-2"></p>
         </div>
-        <script>
-        var url = "{{ song_info.url }}";
-        </script>
         {% endif %}
     </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- JS để gửi request tải -->
+    <script>
+        function download(url, platform, format) {
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url, platform, format })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Tải thất bại.');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = `media.${format === 'audio' ? 'mp3' : 'mp4'}`;
+                link.click();
+            })
+            .catch(error => {
+                alert("Có lỗi xảy ra: " + error.message);
+            });
+        }
+    </script>
 </body>
 </html>
