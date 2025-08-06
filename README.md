@@ -77,5 +77,3 @@ pip install flask yt-dlp
 * Ứng dụng chỉ phục vụ mục đích học tập và nghiên cứu.
 * Việc sử dụng ứng dụng với các nội dung có bản quyền phải tuân thủ quy định pháp luật và điều khoản dịch vụ của nền tảng tương ứng.
 * Không sử dụng ứng dụng trong môi trường sản xuất khi đang bật chế độ `debug`.
-
-```
