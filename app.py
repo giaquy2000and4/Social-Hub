@@ -1,14 +1,10 @@
-from flask import Flask, request, render_template, send_file, jsonify
-import os
+from flask import Flask, request, render_template, jsonify
 
-# Import các service riêng cho từng nền tảng
-from services.youtube_downloader import get_info_youtube, download_youtube
-from services.tiktok_downloader import get_info_tiktok, download_tiktok
 from services.soundcloud_downloader import get_info_soundcloud, download_soundcloud
+from services.tiktok_downloader import get_info_tiktok, download_tiktok
+from services.youtube_downloader import get_info_youtube, download_youtube
 
 app = Flask(__name__)
-DOWNLOAD_FOLDER = 'downloads'
-os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -20,7 +16,6 @@ def index():
         platform = request.form.get('platform')
         format_ = request.form.get('format')
 
-        # Gọi service tùy theo nền tảng
         if platform == 'youtube':
             info = get_info_youtube(url)
         elif platform == 'tiktok':
@@ -30,7 +25,6 @@ def index():
         else:
             info = None
 
-        # Chuẩn hóa info để render ra giao diện
         if info:
             media_info = {
                 'title': info.get('title', 'Không có tiêu đề'),
@@ -47,24 +41,20 @@ def index():
 
 @app.route('/download', methods=['POST'])
 def download():
-    data = request.get_json()
+    # Nhận từ form POST (không dùng JSON nữa)
+    data = request.form
     url = data.get('url')
     platform = data.get('platform')
     format_ = data.get('format')
 
-    file_path = None
-
     if platform == 'youtube':
-        file_path = download_youtube(url, format_)
+        return download_youtube(url, format_)
     elif platform == 'tiktok':
-        file_path = download_tiktok(url, format_)
+        return download_tiktok(url, format_)
     elif platform == 'soundcloud':
-        file_path = download_soundcloud(url, format_)
-
-    if file_path and os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
+        return download_soundcloud(url, format_)
     else:
-        return jsonify({'error': 'Tải không thành công.'}), 400
+        return jsonify({'error': 'Nền tảng không hợp lệ.'}), 400
 
 
 if __name__ == "__main__":

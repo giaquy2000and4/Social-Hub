@@ -49,7 +49,6 @@
             </div>
         </form>
 
-        <!-- Nếu có thông tin media -->
         {% if media_info %}
         <div class="card shadow">
             <div class="row g-0">
@@ -64,42 +63,21 @@
                         <p class="card-text"><strong>Nguồn:</strong> {{ media_info.platform|capitalize }}</p>
                         <p class="card-text"><strong>Người đăng:</strong> {{ media_info.uploader }}</p>
                         <p class="card-text"><strong>Thời lượng:</strong> {{ media_info.duration }} giây</p>
-                        <button class="btn btn-success" onclick="download('{{ media_info.url }}', '{{ media_info.platform }}', '{{ media_info.format }}')">
-                            Tải về {{ 'MP3' if media_info.format == 'audio' else 'MP4' }}
-                        </button>
+
+                        <!-- Form tải về dùng POST chuẩn -->
+                        <form method="POST" action="/download" class="d-inline">
+                            <input type="hidden" name="url" value="{{ media_info.url }}">
+                            <input type="hidden" name="platform" value="{{ media_info.platform }}">
+                            <input type="hidden" name="format" value="{{ media_info.format }}">
+                            <button type="submit" class="btn btn-success">
+                                Tải về {{ 'MP3' if media_info.format == 'audio' else 'MP4' }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
         {% endif %}
     </div>
-
-    <!-- JS để gửi request tải -->
-    <script>
-        function download(url, platform, format) {
-            fetch('/download', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ url, platform, format })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Tải thất bại.');
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = `media.${format === 'audio' ? 'mp3' : 'mp4'}`;
-                link.click();
-            })
-            .catch(error => {
-                alert("Có lỗi xảy ra: " + error.message);
-            });
-        }
-    </script>
 </body>
 </html>
