@@ -20,3 +20,44 @@ h1 {
 .progress {
     height: 25px;
 }
+
+/* Styling cho bảng thông tin định dạng */
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Styling cho select chất lượng */
+.form-select {
+    border: 2px solid #dee2e6;
+}
+
+.form-select:focus {
+    border-color: #ff5500;
+    box-shadow: 0 0 0 0.2rem rgba(255, 85, 0, 0.25);
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Icon cho nút download */
+.btn i {
+    margin-right: 5px;
+}
