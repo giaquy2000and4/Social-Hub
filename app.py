@@ -36,19 +36,27 @@ def index():
                 'format': format_
             }
 
+            # Thêm thông tin formats cho YouTube
+            if platform == 'youtube':
+                media_info.update({
+                    'video_formats': info.get('video_formats', []),
+                    'audio_formats': info.get('audio_formats', [])
+                })
+
     return render_template('index.html', media_info=media_info)
 
 
 @app.route('/download', methods=['POST'])
 def download():
-    # Nhận từ form POST (không dùng JSON nữa)
+    # Nhận từ form POST
     data = request.form
     url = data.get('url')
     platform = data.get('platform')
     format_ = data.get('format')
+    format_id = data.get('format_id')  # Thêm format_id để chọn chất lượng
 
     if platform == 'youtube':
-        return download_youtube(url, format_)
+        return download_youtube(url, format_, format_id)
     elif platform == 'tiktok':
         return download_tiktok(url, format_)
     elif platform == 'soundcloud':
